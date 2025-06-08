@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SMS-Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background-color: #007aff;
+      color: white;
+      padding: 8px;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .status-line {
+      background-color: #0066dd;
+      padding: 6px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .status-line .success {
+      color: #00ff88;
+    }
+
+    .status-line .fail {
+      color: red;
+    }
+
+    #map {
+      flex: 1;
+      width: 100%;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0;
+      background-color: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    }
+
+    .footer .logo-ust {
+      width: 50%;
+      height: auto;
+      margin-right: 5%;
+    }
+
+    .footer .logo-sms {
+      width: 35%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar" id="coordDisplay">等待接收小程序位置坐标...</div>
+  <div class="status-line" id="statusDisplay">未检测到目标设备</div>
+  <div id="map"></div>
+  <div class="footer">
+    <img src="https://sms-lab.github.io/map-viewer/assets/UST-GZ_4C_L4.png" alt="UST-GZ" class="logo-ust" />
+    <img src="https://sms-lab.github.io/map-viewer/assets/SMS-logo-03.png" alt="SMS" class="logo-sms" />
+  </div>
+
+  <script>
+    function getQueryParam(key) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(key);
+    }
+
+    const lng = parseFloat(getQueryParam("lng"));
+    const lat = parseFloat(getQueryParam("lat"));
+    const detected = getQueryParam("detected");
+    const dataStr = getQueryParam("data");
+
+    const coordText = document.getElementById("coordDisplay");
+    const statusText = document.getElementById("statusDisplay");
+
+    if (!isNaN(lng) && !isNaN(lat)) {
+      coordText.textContent = `Lng: ${lng.toFixed(5)}, Lat: ${lat.toFixed(5)}`;
+    }
+
+    if (detected === "1") {
+      statusText.innerHTML = "? <span class='success'>已成功检测到目标设备</span>";
+    } else {
+      statusText.innerHTML = "? <span class='fail'>未检测到目标设备</span>";
+    }
+
+    if (dataStr) {
+      const decoded = decodeURIComponent(dataStr);
+      const formatted = decoded.replace(/,/g, ', ');
+      const newLine = document.createElement("div");
+      newLine.innerHTML = `广播包数据（十进制）：【${formatted}】`;
+      newLine.style.marginTop = "4px";
+      newLine.style.fontSize = "13px";
+      statusText.appendChild(newLine);
+    }
+
+    const map = L.map('map').setView(
+      (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : [22.887308, 113.482026],
+      16
+    );
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '? OpenStreetMap contributors'
+    }).addTo(map);
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      L.marker([lat, lng]).addTo(map).bindPopup("当前定位").openPopup();
+    }
+  </script>
+</body>
+</html>
