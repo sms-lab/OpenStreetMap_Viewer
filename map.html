@@ -95,9 +95,9 @@
     }
 
     if (detected === "1") {
-      statusText.innerHTML = "? <span class='success'>已成功检测到目标设备</span>";
+      statusText.innerHTML = "✅ <span class='success'>已成功检测到目标设备</span>";
     } else {
-      statusText.innerHTML = "? <span class='fail'>未检测到目标设备</span>";
+      statusText.innerHTML = "❌ <span class='fail'>未检测到目标设备</span>";
     }
 
     if (dataStr) {
@@ -112,7 +112,7 @@
 
     const map = L.map('map').setView(
       (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : [22.887308, 113.482026],
-      16
+      15
     );
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
